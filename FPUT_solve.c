@@ -17,6 +17,10 @@
 int N = 64, np = 4;
 double beta = 1.0, dt = 0.005;
 
+// Filenames etc
+FILE* Ek;
+FILE* chain;
+
 /*  
  *  PROBLEM FUNCTIONS
  *  
@@ -24,17 +28,15 @@ double beta = 1.0, dt = 0.005;
 void ini_x(double* xx, double* vv);
 void update_v(double* xx, double* vv, double ddt);
 void update_x(double* xx, double* vv, double ddt);
+void print_data(double* xx, double* vv);
 
 int main(){
 
 	// Filenames etc
-	FILE* Ek = fopen("Ek.data","w");
-	FILE* chain = fopen("Chain.data","w");
-
-	// Indexes and temp variables
-	int i,j;
+	Ek = fopen("Ek.data","w");
+	chain = fopen("Chain.data","w");
 	
-	// Number of iterations
+	// Final time
 	int tf = 5.0*N*N;
 
 	// Mem Alloc for position x and velocity v **** Paralelization ****
@@ -43,15 +45,25 @@ int main(){
 	ini_x(x,v);
 	
 	// Time and index for writing
-	int t = 0, i = 0;
+	double t = 0;
+	// int i = 0;
 	do{
 		update_v(x,v,dt/2);
 		update_x(x,v,dt);
 		update_v(x,v,dt/2);
-		
+		int mod = ((int)(t/dt))%((int)(tf/(1000*dt)));
+		if( mod == 0 ){
+
+			// Calculates energy of the first, second and third mode
+			//printf("%d\n",i);
+			print_data(x,v);	
+			//i++;	
+		}
 
 		t += dt;
 	}while(t <= tf);
+	fclose(Ek);
+	fclose(chain);
 	return 0;
 }
 
@@ -94,3 +106,28 @@ void update_x(double* xx, double* vv, double ddt){
 	}
 	//return vec;
 }
+
+/*
+ *  Prints energy of modes 1,2 and 3 as well as the configuration of the chain
+ *
+ */
+void print_data(double* xx, double* vv){
+	int i;
+	double e1 = 0;
+	double e2 = 0;
+	double e3 = 0;
+	double wk = 1;
+	// Calculates energy of 3 modes
+	for( i = 0; i < N; i++ ){
+		e1 += wk*sqrt(2/(N-1))*xx[i]*sin(1*M_PI*i/(N-1))+ pow(vv[i],2);
+		e2 += wk*sqrt(2/(N-1))*xx[i]*sin(2*M_PI*i/(N-1))+ pow(vv[i],2);
+		e3 += wk*sqrt(2/(N-1))*xx[i]*sin(3*M_PI*i/(N-1))+ pow(vv[i],2);
+		// Prints x and v
+		fprintf(chain, "%f,%f\n", xx[i], vv[i]);
+	}
+	fprintf(Ek, "%f,%f,%f\n", e1, e2, e3);
+}
+
+
+
+
