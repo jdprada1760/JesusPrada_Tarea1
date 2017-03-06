@@ -14,32 +14,44 @@
  *  np    -> Number of procs to use
  *  
  */
-int N = 1024, np = 4;
-double beta = 0.3, dt = 0.001;
+int N = 64, np = 4;
+double beta = 1.0, dt = 0.005;
 
 /*  
  *  PROBLEM FUNCTIONS
  *  
  */
-void ini_x(double* vec);
-void update_v(double* xx, double ** vv, double ddt);
-void update_x(double* vv, double ** xx, double ddt);
+void ini_x(double* xx, double* vv);
+void update_v(double* xx, double* vv, double ddt);
+void update_x(double* xx, double* vv, double ddt);
 
 int main(){
+
+	// Filenames etc
+	FILE* Ek = fopen("Ek.data","w");
+	FILE* chain = fopen("Chain.data","w");
+
 	// Indexes and temp variables
 	int i,j;
 	
 	// Number of iterations
-	int nit = 100*N;
+	int tf = 5.0*N*N;
 
 	// Mem Alloc for position x and velocity v **** Paralelization ****
 	double* x = malloc(N*sizeof(double));
 	double* v = malloc(N*sizeof(double));
-	ini_x(x);
+	ini_x(x,v);
 	
-	for( i = 0; i < N; i++ ){
+	// Time and index for writing
+	int t = 0, i = 0;
+	do{
+		update_v(x,v,dt/2);
+		update_x(x,v,dt);
+		update_v(x,v,dt/2);
 		
-	}
+
+		t += dt;
+	}while(t <= tf);
 	return 0;
 }
 
@@ -52,7 +64,7 @@ int main(){
 void ini_x(double* xx, double* vv){
 	int i;
 	for( i = 0; i < N; i++ ){
-		xx[i] = sin(2*M_PI*i/(N-1));
+		xx[i] = sin(M_PI*i/(N-1));
 		vv[i] = 0;
 	}
 }
@@ -61,12 +73,12 @@ void ini_x(double* xx, double* vv){
  *  Updates velocity given the position and the finite difference ddt
  *
  */
-void update_v(double* xx, double ** vv, double ddt){
+void update_v(double* xx, double* vv, double ddt){
 	int i;
 	// Actualizes vv
 	for( i = 1; i < N-1; i++ ){
 		// Acceleration is defined as the term multiplying ddt
-		vv[i] = vv[i]+(ddt)*(x[i+1] + x[i-1] - 2*x[i] + beta*(pow(x[i+1]-x[i],3) - pow(x[i]-x[i-1],3)));
+		vv[i] = vv[i]+(ddt)*(xx[i+1] + xx[i-1] - 2*xx[i] + beta*(pow(xx[i+1]-xx[i],3) - pow(xx[i]-xx[i-1],3)));
 	}
 }
 
@@ -74,7 +86,7 @@ void update_v(double* xx, double ** vv, double ddt){
  *  Updates position given the previous velocity and the finite difference ddt
  *
  */
-void update_x(double* xx, double ** vv, double ddt){
+void update_x(double* xx, double* vv, double ddt){
 	int i;
 	// Actualizes xx
 	for( i = 1; i < N-1; i++ ){
