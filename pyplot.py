@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 from matplotlib import animation
 
 # Loads data #Energy modes and #Chain configutation
-modes = np.loadtxt("Ek.data", delimiter = ',')[:100].T
+modes = np.loadtxt("Ek.data", delimiter = ',').T
 chain = np.loadtxt("Chain.data", delimiter = ',', usecols = (0,))
 
 # Reshape chain array to plot 
-chain = chain.reshape((1001,64))
+chain = chain.reshape((len(modes.T),64))
 
 
 # Plots energy modes
@@ -18,12 +18,13 @@ ax.plot(modes[1], c='g')
 ax.plot(modes[2], c='b')
 plt.show()
 
-'''
+
 # Plots evolution
 plt.imshow(np.log(chain+0.00001))
 plt.show()
-
-
+'''
+'''
+'''
 # First set up the figure, the axis, and the plot element we want to animate
 fig = plt.figure()
 ax = plt.axes(xlim=(0, 64), ylim=(-2, 2))
@@ -43,7 +44,7 @@ def animate(i):
 
 # call the animator.  blit=True means only re-draw the parts that have changed.
 anim = animation.FuncAnimation(fig, animate, init_func=init,
-                               frames=200, interval=20, blit=True)
+                               frames=10000, interval=20, blit=False)
 
 plt.show()
 '''

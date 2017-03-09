@@ -45,7 +45,7 @@ int main(){
 	chain = fopen("Chain.data","w");
 
 	// Final time
-	double tf = N*N;
+	double tf = 5*N*N;
 
 	// Mem Alloc for position x and velocity v **** Paralelization ****
 	double* x = malloc(N*sizeof(double));
@@ -95,7 +95,7 @@ int main(){
 void ini_x(double* xx, double* vv){
 	int i;
 	for( i = 0; i < N; i++ ){
-		xx[i] = sin(2.0*M_PI*i/(N-1));
+		xx[i] = sin(M_PI*i/(N-1));
 		vv[i] = 0;
 	}
 }
@@ -154,11 +154,11 @@ double getE(double* xx, double* vv, int n){
 	// Defines dot(An) 
 	double Adn = 0;
 	// Defines wn
-	double wn = 4*pow(sin(n*M_PI/(2*N+2)),2);
+	double wn = 4*pow(sin(n*M_PI/(2*N-2)),2);
 	for( i = 0; i < N; i++ ){
 		
-		An  += sqrt(2.0/(N+1))*xx[i]*sin(n*M_PI*i/(N+1));
-		Adn += sqrt(2.0/(N+1))*vv[i]*sin(n*M_PI*i/(N+1));
+		An  += sqrt(2.0/(N-1))*xx[i]*sin(n*M_PI*i/(N-1));
+		Adn += sqrt(2.0/(N-1))*vv[i]*sin(n*M_PI*i/(N-1));
 
 	}
 	return 0.5*(pow(An,2)+pow(wn*An,2));
