@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 //#include <mpi.h>
 
 /*  
@@ -21,6 +22,7 @@ double dt = 0.005;
 // Filenames etc
 FILE* Ek;
 FILE* chain;
+FILE* ttime;
 
 /*  
  *  PROBLEM FUNCTIONS
@@ -30,13 +32,18 @@ void ini_x(double* xx, double* vv);
 void update_v(double* xx, double* vv, double ddt);
 void update_x(double* xx, double* vv, double ddt);
 void print_data(double* xx, double* vv);
+double getE(double* xx, double* vv, int n);
 
 int main(){
+	
+	// Time
+	ttime = fopen("Time.data","w"); 
+	clock_t ini = clock();
 
 	// Filenames etc
 	Ek = fopen("Ek.data","w");
 	chain = fopen("Chain.data","w");
-	
+
 	// Final time
 	double tf = N*N;
 
@@ -63,10 +70,19 @@ int main(){
 		
 		t += dt;
 	}while(t <= tf);
+	
+	// Closes files and deallocate memory
 	fclose(Ek);
 	fclose(chain);
 	free(x);
 	free(v);
+	
+	// Gets time and writes it on file (time) and then closes the file
+	clock_t fin = clock();
+	double time_elapsed = ((double)(fin - ini))/CLOCKS_PER_SEC;
+	fprintf(ttime, "%f\n", time_elapsed);
+	fclose(ttime);
+
 	return 0;
 }
 
@@ -91,9 +107,10 @@ void ini_x(double* xx, double* vv){
 void update_v(double* xx, double* vv, double ddt){
 	int i;
 	// Actualizes vv
-	for( i = 0; i < N; i++ ){
+	for( i = 1; i < N-1; i++ ){
 		// Acceleration is defined as the term multiplying ddt
-		vv[i%N] += (ddt)*(xx[(i+1)%N] + xx[(i-1)%N] - 2.0*xx[i%N] + beta*(pow(xx[(i+1)%N]-xx[i%N],3.0) - pow(xx[i%N]-xx[(i-1)%N],3.0)));
+		//vv[i%N] += (ddt)*(xx[(i+1)%N] + xx[(i-1)%N] - 2.0*xx[i%N] + beta*(pow(xx[(i+1)%N]-xx[i%N],2.0) - pow(xx[i%N]-xx[(i-1)%N],2.0)));
+		vv[i] += (ddt)*(xx[(i+1)] + xx[(i-1)] - 2.0*xx[i] + beta*(pow(xx[(i+1)]-xx[i],2.0) - pow(xx[i]-xx[(i-1)],2.0)));
 	}
 }
 
@@ -116,21 +133,35 @@ void update_x(double* xx, double* vv, double ddt){
  */
 void print_data(double* xx, double* vv){
 	int i;
-	double e1 = 0;
-	double e2 = 0;
-	double e3 = 0;
-	double wk = 1;
+	double e1 = getE(xx, vv, 1);
+	double e2 = getE(xx, vv, 3);
+	double e3 = getE(xx, vv, 2);
 	// Calculates energy of 3 modes
 	for( i = 0; i < N; i++ ){
-		e1 += pow(wk*sqrt(2.0/(N-1))*xx[i]*sin(1.0*M_PI*i/(N-1)),2)+ pow(vv[i],2);
-		e2 += pow(wk*sqrt(2.0/(N-1))*xx[i]*sin(2.0*M_PI*i/(N-1)),2)+ pow(vv[i],2);
-		e3 += pow(wk*sqrt(2.0/(N-1))*xx[i]*sin(3.0*M_PI*i/(N-1)),2)+ pow(vv[i],2);
-		// Prints x and v
 		fprintf(chain, "%f,%f\n", xx[i], vv[i]);
 	}
-	fprintf(Ek, "%f,%f,%f\n", 0.5*e1, 0.5*e2, 0.5*e3);
+	fprintf(Ek, "%f,%f,%f\n", e1, e2, e3);
 }
 
+/*
+ *  Gets energy of mode n given xx and vv
+ *
+ */
+double getE(double* xx, double* vv, int n){
+	int i;
+	// Defines An 
+	double An = 0;
+	// Defines dot(An) 
+	double Adn = 0;
+	// Defines wn
+	double wn = 4*pow(sin(n*M_PI/(2*N+2)),2);
+	for( i = 0; i < N; i++ ){
+		
+		An  += sqrt(2.0/(N+1))*xx[i]*sin(n*M_PI*i/(N+1));
+		Adn += sqrt(2.0/(N+1))*vv[i]*sin(n*M_PI*i/(N+1));
 
+	}
+	return 0.5*(pow(An,2)+pow(wn*An,2));
 
+}
 
