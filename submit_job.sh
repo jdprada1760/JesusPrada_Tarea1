@@ -5,4 +5,6 @@
 
 module load rocks-openmpi_ib
 cd $PBS_O_WORKDIR
-./a.out Time2.data Ek2.data Chain2.data 2
+./a.out Time2.data Ek2.data Chain.data 2
+./a.out Time4.data Ek4.data Chain.data 4
+./a.out Time8.data Ek8.data Chain.data 8
