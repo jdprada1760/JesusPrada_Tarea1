@@ -1,19 +1,18 @@
-EXECS=placas.x
-MPICC?=mpicc
+EXECS=a.out
 
-all: out.data
+all: Energies.png  Time2.data Time4.data Time8.data 
 
-v.png: plotter.py out.data
-	plotter.py
-	rm -f test.*
+Energies.png: Ek2.data
+	python pyplot Ek2.data
 
-out.data: submit_job.sh placas.x
+Time2.data: a.out submit_job.sh
 	qsub submit_job.sh
+	
 
-placas.x : placas.c
-	${MPICC} -o placas.x placas.c
+a.out : FPUT_solve.c
+	gcc -Wall FPUT_solve.c -fopenmp -lm
 
 clean:
-	rm -f ${EXECS}
-	rm -f out.data
+	rm -f a.out
+	rm -f *.data
 	rm -f test*
