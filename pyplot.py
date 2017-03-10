@@ -9,22 +9,23 @@ import sys
 #from matplotlib import animation
 
 
-# Loads data #Energy modes and #Chain configutation
+# Loads data #Energy modes and
 modes = np.loadtxt(sys.argv[1], delimiter = ',').T
-#chain = np.loadtxt("Chain.data", delimiter = ',', usecols = (0,))
 
+#chain = np.loadtxt("Chain.data", delimiter = ',', usecols = (0,))
 # Reshape chain array to plot 
 # chain = chain.reshape((len(modes.T),64))
 
 
 # Plots energy modes
 fig = plt.figure()
+times = np.range(0,1000)*(5.0*(64**2.2)/1000.0)
 ax = fig.add_subplot(111)
 style = 'o'
 ms = 0.5
-ax.plot(modes[0], c='r', linestyle='None', marker=style, markersize = ms)
-ax.plot(modes[1], c='g', linestyle='None', marker=style, markersize = ms)
-ax.plot(modes[2], c='b', linestyle='None', marker=style, markersize = ms)
+ax.plot(times,modes[0], c='r', linestyle='None', marker=style, markersize = ms)
+ax.plot(times,modes[1], c='g', linestyle='None', marker=style, markersize = ms)
+ax.plot(times,modes[2], c='b', linestyle='None', marker=style, markersize = ms)
 ax.set_title("Energy modes 1,2,3")
 # Arbitrary units
 ax.set_ylabel("Energy")
