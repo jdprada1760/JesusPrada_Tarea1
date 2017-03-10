@@ -5,5 +5,4 @@
 
 module load rocks-openmpi_ib
 cd $PBS_O_WORKDIR
-NPROCS=`wc -l < $PBS_NODEFILE`
-mpiexec -v -n $NPROCS ./placas.x
+./a.out Time2.data Ek2.data Chain2.data 2
