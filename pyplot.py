@@ -21,15 +21,15 @@ modes = np.loadtxt(sys.argv[1], delimiter = ',').T
 fig = plt.figure()
 times = np.array(range(0,1000))*(5.0*(64**2.2)/1000.0)
 ax = fig.add_subplot(111)
-style = 'o'
-ms = 0.5
-ax.plot(times,modes[0], c='r', linestyle='None', marker=style, markersize = ms)
-ax.plot(times,modes[1], c='g', linestyle='None', marker=style, markersize = ms)
-ax.plot(times,modes[2], c='b', linestyle='None', marker=style, markersize = ms)
+ms = 0.8
+ax.plot(times,modes[0], c='r', label="Mode 1")
+ax.plot(times,modes[1], c='g', label="Mode 2")
+ax.plot(times,modes[2], c='b', label="Mode 3")
 ax.set_title("Energy modes 1,2,3")
 # Arbitrary units
 ax.set_ylabel("Energy")
 ax.set_xlabel("Time")
+ax.legend()
 #plt.show()
 fig.savefig('Energies.png')
 

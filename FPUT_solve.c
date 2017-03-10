@@ -86,9 +86,8 @@ int main( int argc, char** argv){
 	free(v);
 	
 	// Gets time and writes it on file (time) and then closes the file
-	clock_t fin = clock();
-	double fin = omp_get_wtime() - start_time;
-	fprintf(ttime, "%f\n", time_elapsed);
+	double fin = omp_get_wtime() - ini;
+	fprintf(ttime, "%f\n", fin);
 	fclose(ttime);
 
 	return 0;
