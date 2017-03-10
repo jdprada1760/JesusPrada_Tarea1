@@ -14,13 +14,15 @@ t8 = np.loadtxt(sys.argv[3], delimiter = ',')
 
 # Array of times and respective procesors
 tarr = np.array([t2,t4,t8])
-nump = np.array([2,4,6]) 
+nump = np.array([2,4,8]) 
 
 # Plot 
 fig = plt.figure()
 ax = fig.add_subplot(111)
 style = 'o'
 ax.plot(nump,tarr, linestyle='None', marker=style)
+ax.set_xlim(0,9)
+ax.set_ylim(min(tarr)-3,max(tarr)+3)
 ax.set_title("Parallelization eficiency")
 ax.set_ylabel("Time(s)")
 ax.set_xlabel("Number of procesors")
