@@ -19,7 +19,8 @@ ms = 0.5
 ax.plot(modes[0], c='r', linestyle='None', marker=style, markersize = ms)
 ax.plot(modes[1], c='g', linestyle='None', marker=style, markersize = ms)
 ax.plot(modes[2], c='b', linestyle='None', marker=style, markersize = ms)
-plt.show()
+#plt.show()
+fig.savefig('Energies.png')
 
 '''
 # Plots evolution
