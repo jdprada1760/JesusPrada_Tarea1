@@ -42,7 +42,7 @@ int main( int argc, char** argv){
 	
 	// Time
 	ttime = fopen(argv[1],"w"); 
-	clock_t ini = clock();
+	double ini = omp_get_wtime();
 	
 	// Procesor
 	np =  atoi(argv[3]);
@@ -87,7 +87,7 @@ int main( int argc, char** argv){
 	
 	// Gets time and writes it on file (time) and then closes the file
 	clock_t fin = clock();
-	double time_elapsed = ((double)(fin - ini))/CLOCKS_PER_SEC;
+	double fin = omp_get_wtime() - start_time;
 	fprintf(ttime, "%f\n", time_elapsed);
 	fclose(ttime);
 
@@ -114,14 +114,16 @@ void ini_x(double* xx, double* vv){
  */
 void update_v(double* xx, double* vv, double ddt){
 	int i;
+	double aux;
 	// Actualizes vv
-	#pragma omp parallel for
+//#pragma omp parallel for private(aux) shared(xx,vv)
 	for( i = 1; i < N-1; i++ ){
 		// Acceleration is defined as the term multiplying ddt
 		//vv[i%N] += (ddt)*(xx[(i+1)%N] + xx[(i-1)%N] - 2.0*xx[i%N] + beta*(pow(xx[(i+1)%N]-xx[i%N],2.0) - pow(xx[i%N]-xx[(i-1)%N],2.0)));
-		vv[i] += (ddt)*(xx[(i+1)] + xx[(i-1)] - 2.0*xx[i] + beta*(pow(xx[(i+1)]-xx[i],2.0) - pow(xx[i]-xx[(i-1)],2.0)));
+		aux = (ddt)*(xx[(i+1)] + xx[(i-1)] - 2.0*xx[i] + beta*(pow(xx[(i+1)]-xx[i],2.0) - pow(xx[i]-xx[(i-1)],2.0)));
+		vv[i] += aux;
 	}
-	#pragma omp barrier
+
 }
 
 /*
@@ -130,13 +132,15 @@ void update_v(double* xx, double* vv, double ddt){
  */
 void update_x(double* xx, double* vv, double ddt){
 	int i;
+	double aux;
 	// Actualizes xx
-	#pragma omp parallel for
+//#pragma omp parallel for private(aux) shared(vv,xx)
 	for( i = 1; i < N-1; i++ ){
 		//xx[i%N] = xx[i%N]+ddt*vv[i%N];
-		xx[i] = xx[i]+ddt*vv[i];
+		aux = ddt*vv[i];
+		xx[i] += aux;
 	}
-	#pragma omp barrier
+
 }
 
 /*
@@ -144,7 +148,7 @@ void update_x(double* xx, double* vv, double ddt){
  *
  */
 void print_data(double* xx, double* vv){
-	int i;
+	//int i;
 	double e1 = getE(xx, vv, 1.0);
 	double e2 = getE(xx, vv, 2.0);
 	double e3 = getE(xx, vv, 3.0);
@@ -169,6 +173,7 @@ double getE(double* xx, double* vv, int n){
 	double Adn = 0;
 	// Defines wn
 	double wn = 4.0*pow(sin(n*M_PI/(2.0*N-2.0)),2);
+#pragma omp parallel for reduction(+:An,Adn)
 	for( i = 0; i < N; i++ ){
 		
 		An  += sqrt(2.0/(N-1))*xx[i]*sin(n*M_PI*i/(N-1.0));
