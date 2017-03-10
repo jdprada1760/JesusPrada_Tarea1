@@ -1,10 +1,13 @@
 // This code solves Fermi-Pasta-Ulam-Tsingou differential equation for 
 // a given inital condition using leapfrog. Parameters are defined below.
 
+// Man ./a.out Time.data Ek.data Chain.data 4
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include "omp.h"
 //#include <mpi.h>
 
 /*  
@@ -15,7 +18,8 @@
  *  np    -> Number of procs to use
  *  
  */
-int N = 64, np = 4;
+int N = 64;
+int np;
 double beta = 1.0;
 double dt = 0.005;
 
@@ -34,18 +38,22 @@ void update_x(double* xx, double* vv, double ddt);
 void print_data(double* xx, double* vv);
 double getE(double* xx, double* vv, int n);
 
-int main(){
+int main( int argc, char** argv){
 	
 	// Time
-	ttime = fopen("Time.data","w"); 
+	ttime = fopen(argv[1],"w"); 
 	clock_t ini = clock();
-
+	
+	// Procesor
+	np =  atoi(argv[4]);
+	omp_set_num_threads(np);
+	
 	// Filenames etc
-	Ek = fopen("Ek.data","w");
-	chain = fopen("Chain.data","w");
+	Ek = fopen(argv[2],"w");
+	chain = fopen(argv[3],"w");
 
 	// Final time
-	double tf = 5*N*N;
+	double tf = 5.0*pow(N,2.2);
 
 	// Mem Alloc for position x and velocity v **** Paralelization ****
 	double* x = malloc(N*sizeof(double));
@@ -57,7 +65,7 @@ int main(){
 	int i = 0;
 	do{	
 		int mod = ((int)(t/dt))%((int)(tf/(1000*dt)));
-		if( mod == 0 ){
+		if( mod == 0 && i < 1000 ){
 
 			// Calculates energy of the first, second and third mode
 			printf("%d\n",i);
@@ -107,6 +115,7 @@ void ini_x(double* xx, double* vv){
 void update_v(double* xx, double* vv, double ddt){
 	int i;
 	// Actualizes vv
+	#pragma omp parallel for
 	for( i = 1; i < N-1; i++ ){
 		// Acceleration is defined as the term multiplying ddt
 		//vv[i%N] += (ddt)*(xx[(i+1)%N] + xx[(i-1)%N] - 2.0*xx[i%N] + beta*(pow(xx[(i+1)%N]-xx[i%N],2.0) - pow(xx[i%N]-xx[(i-1)%N],2.0)));
@@ -121,8 +130,10 @@ void update_v(double* xx, double* vv, double ddt){
 void update_x(double* xx, double* vv, double ddt){
 	int i;
 	// Actualizes xx
-	for( i = 0; i < N; i++ ){
-		xx[i%N] = xx[i%N]+ddt*vv[i%N];
+	#pragma omp parallel for
+	for( i = 1; i < N-1; i++ ){
+		//xx[i%N] = xx[i%N]+ddt*vv[i%N];
+		xx[i] = xx[i]+ddt*vv[i];
 	}
 	//return vec;
 }
@@ -133,9 +144,9 @@ void update_x(double* xx, double* vv, double ddt){
  */
 void print_data(double* xx, double* vv){
 	int i;
-	double e1 = getE(xx, vv, 1);
-	double e2 = getE(xx, vv, 3);
-	double e3 = getE(xx, vv, 2);
+	double e1 = getE(xx, vv, 1.0);
+	double e2 = getE(xx, vv, 2.0);
+	double e3 = getE(xx, vv, 3.0);
 	// Calculates energy of 3 modes
 	for( i = 0; i < N; i++ ){
 		fprintf(chain, "%f,%f\n", xx[i], vv[i]);
@@ -154,14 +165,14 @@ double getE(double* xx, double* vv, int n){
 	// Defines dot(An) 
 	double Adn = 0;
 	// Defines wn
-	double wn = 4*pow(sin(n*M_PI/(2*N-2)),2);
+	double wn = 4.0*pow(sin(n*M_PI/(2.0*N-2.0)),2);
 	for( i = 0; i < N; i++ ){
 		
-		An  += sqrt(2.0/(N-1))*xx[i]*sin(n*M_PI*i/(N-1));
-		Adn += sqrt(2.0/(N-1))*vv[i]*sin(n*M_PI*i/(N-1));
+		An  += sqrt(2.0/(N-1))*xx[i]*sin(n*M_PI*i/(N-1.0));
+		Adn += sqrt(2.0/(N-1))*vv[i]*sin(n*M_PI*i/(N-1.0));
 
 	}
-	return 0.5*(pow(An,2)+pow(wn*An,2));
+	return 0.5*(pow(Adn,2)+pow(wn*An,2));
 
 }
 

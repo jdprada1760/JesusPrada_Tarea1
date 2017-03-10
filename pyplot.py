@@ -13,16 +13,18 @@ chain = chain.reshape((len(modes.T),64))
 # Plots energy modes
 fig = plt.figure()
 ax = fig.add_subplot(111)
-ax.plot(modes[0], c='r')
-ax.plot(modes[1], c='g')
-ax.plot(modes[2], c='b')
+style = 'o'
+ms = 0.5
+ax.plot(modes[0], c='r', linestyle='None', marker=style, markersize = ms)
+ax.plot(modes[1], c='g', linestyle='None', marker=style, markersize = ms)
+ax.plot(modes[2], c='b', linestyle='None', marker=style, markersize = ms)
 plt.show()
 
-
+'''
 # Plots evolution
 plt.imshow(np.log(chain+0.00001))
 plt.show()
-'''
+
 '''
 '''
 # First set up the figure, the axis, and the plot element we want to animate
