@@ -8,13 +8,13 @@ import matplotlib.pyplot as plt
 import sys
 
 # Load data
-t2 = np.loadtxt(sys.argv[1], delimiter = ',')
-t4 = np.loadtxt(sys.argv[2], delimiter = ',')
-t8 = np.loadtxt(sys.argv[3], delimiter = ',')
+t1 = np.loadtxt(sys.argv[1], delimiter = ',')
+t2 = np.loadtxt(sys.argv[2], delimiter = ',')
+t4 = np.loadtxt(sys.argv[3], delimiter = ',')
 
 # Array of times and respective procesors
-tarr = np.array([t2,t4,t8])
-nump = np.array([2,4,8]) 
+tarr = np.array([t1,t2,t4])
+nump = np.array([1,2,4]) 
 
 # Plot 
 fig = plt.figure()

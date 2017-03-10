@@ -2,13 +2,13 @@ EXECS=a.out
 
 all: Energies.png  TimeEvol.png
 
-TimeEvol.png: Time2.data Time4.data Time8.data
-	python timeplot.py Time2.data Time4.data Time8.data
+TimeEvol.png: Time1.data Time2.data Time4.data
+	python timeplot.py Time1.data Time2.data Time4.data
 
-Energies.png: Ek2.data
-	python pyplot.py Ek2.data
+Energies.png: Ek.data
+	python pyplot.py Ek.data
 
-Time2.data Time4.data Time8.data Ek2.data: a.out submit_job.sh
+Time1.data Time2.data Time4.data Ek.data: a.out submit_job.sh
 	qsub submit_job.sh
 
 a.out : FPUT_solve.c
