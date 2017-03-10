@@ -1,7 +1,7 @@
 // This code solves Fermi-Pasta-Ulam-Tsingou differential equation for 
 // a given inital condition using leapfrog. Parameters are defined below.
 
-// Man ./a.out Time.data Ek.data Chain.data 4
+// Man ./a.out Time.data Ek.data 4
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,12 +45,12 @@ int main( int argc, char** argv){
 	clock_t ini = clock();
 	
 	// Procesor
-	np =  atoi(argv[4]);
+	np =  atoi(argv[3]);
 	omp_set_num_threads(np);
 	
 	// Filenames etc
 	Ek = fopen(argv[2],"w");
-	chain = fopen(argv[3],"w");
+	//chain = fopen(argv[3],"w");
 
 	// Final time
 	double tf = 5.0*pow(N,2.2);
@@ -81,7 +81,7 @@ int main( int argc, char** argv){
 	
 	// Closes files and deallocate memory
 	fclose(Ek);
-	fclose(chain);
+	//fclose(chain);
 	free(x);
 	free(v);
 	
@@ -121,6 +121,7 @@ void update_v(double* xx, double* vv, double ddt){
 		//vv[i%N] += (ddt)*(xx[(i+1)%N] + xx[(i-1)%N] - 2.0*xx[i%N] + beta*(pow(xx[(i+1)%N]-xx[i%N],2.0) - pow(xx[i%N]-xx[(i-1)%N],2.0)));
 		vv[i] += (ddt)*(xx[(i+1)] + xx[(i-1)] - 2.0*xx[i] + beta*(pow(xx[(i+1)]-xx[i],2.0) - pow(xx[i]-xx[(i-1)],2.0)));
 	}
+	#pragma omp barrier
 }
 
 /*
@@ -135,7 +136,7 @@ void update_x(double* xx, double* vv, double ddt){
 		//xx[i%N] = xx[i%N]+ddt*vv[i%N];
 		xx[i] = xx[i]+ddt*vv[i];
 	}
-	//return vec;
+	#pragma omp barrier
 }
 
 /*
@@ -148,9 +149,11 @@ void print_data(double* xx, double* vv){
 	double e2 = getE(xx, vv, 2.0);
 	double e3 = getE(xx, vv, 3.0);
 	// Calculates energy of 3 modes
+	/*
 	for( i = 0; i < N; i++ ){
 		fprintf(chain, "%f,%f\n", xx[i], vv[i]);
 	}
+	*/
 	fprintf(Ek, "%f,%f,%f\n", e1, e2, e3);
 }
 
