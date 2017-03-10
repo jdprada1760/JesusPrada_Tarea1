@@ -19,7 +19,7 @@ modes = np.loadtxt(sys.argv[1], delimiter = ',').T
 
 # Plots energy modes
 fig = plt.figure()
-times = np.array(range(0,1000)*(5.0*(64**2.2)/1000.0))
+times = np.array(range(0,1000))*(5.0*(64**2.2)/1000.0)
 ax = fig.add_subplot(111)
 style = 'o'
 ms = 0.5
