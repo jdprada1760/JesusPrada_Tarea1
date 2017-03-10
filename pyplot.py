@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import sys
 from matplotlib import animation
 
+# Solves display problems 
+matplotlib.use('Agg')
 # Loads data #Energy modes and #Chain configutation
 modes = np.loadtxt(sys.argv[1], delimiter = ',').T
 #chain = np.loadtxt("Chain.data", delimiter = ',', usecols = (0,))
