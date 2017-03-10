@@ -1,13 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 from matplotlib import animation
 
 # Loads data #Energy modes and #Chain configutation
-modes = np.loadtxt("Ek.data", delimiter = ',').T
-chain = np.loadtxt("Chain.data", delimiter = ',', usecols = (0,))
+modes = np.loadtxt(sys.argv[1], delimiter = ',').T
+#chain = np.loadtxt("Chain.data", delimiter = ',', usecols = (0,))
 
 # Reshape chain array to plot 
-chain = chain.reshape((len(modes.T),64))
+# chain = chain.reshape((len(modes.T),64))
 
 
 # Plots energy modes
