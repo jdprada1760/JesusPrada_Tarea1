@@ -1,3 +1,4 @@
+############################## This program graphics energy modes 1,2,3 for FPUT problem ############################################################
 import matplotlib
 # Solves display problems 
 matplotlib.use('Agg')
@@ -24,6 +25,10 @@ ms = 0.5
 ax.plot(modes[0], c='r', linestyle='None', marker=style, markersize = ms)
 ax.plot(modes[1], c='g', linestyle='None', marker=style, markersize = ms)
 ax.plot(modes[2], c='b', linestyle='None', marker=style, markersize = ms)
+ax.set_title("Energy modes 1,2,3")
+# Arbitrary units
+ax.set_ylabel("Energy")
+ax.set_xlabel("Time")
 #plt.show()
 fig.savefig('Energies.png')
 
